@@ -8,7 +8,7 @@ import (
 
 type TaskRepository interface {
 	Create(payload model.Task) (model.Task, error)
-	List() []model.Task
+	List() ([]model.Task, error)
 	GetByAuthorID(authorID string) ([]model.Task, error)
 }
 
@@ -37,9 +37,46 @@ func (t *taskRepository) Create(payload model.Task) (model.Task, error) {
 }
 
 func (t *taskRepository) GetByAuthorID(authorID string) ([]model.Task, error) {
-	return []model.Task{}, nil
+	var tasks []model.Task
+	query := "SELECT id,title,content,created_at FROM tasks WHERE author_id = $1"
+
+	rows, err := t.db.Query(query, authorID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var task model.Task
+		task.AuthorID = authorID
+		err := rows.Scan(&task.ID, &task.Title, &task.Content, &task.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+		tasks = append(tasks, task)
+	}
+
+	return tasks, nil
 }
 
-func (t *taskRepository) List() []model.Task {
-	return []model.Task{}
+func (t *taskRepository) List() ([]model.Task, error) {
+	var tasks []model.Task
+	query := "SELECT id,title,content,author_id,created_at FROM tasks"
+
+	rows, err := t.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var task model.Task
+		err := rows.Scan(&task.ID, &task.Title, &task.Content, &task.AuthorID, &task.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+		tasks = append(tasks, task)
+	}
+
+	return tasks, nil
 }
