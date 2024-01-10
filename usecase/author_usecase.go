@@ -8,7 +8,7 @@ import (
 type AuthorUsecase interface {
 	FindAuthorByID(id string) (model.Author, error)
 	FindAuthorByEmail(email string) (model.Author, error)
-	FindAllAuthor() ([]model.Author, error)
+	FindAllAuthor(id string) ([]model.Author, error)
 }
 
 type authorUsecase struct {
@@ -31,8 +31,8 @@ func (a *authorUsecase) FindAuthorByEmail(email string) (model.Author, error) {
 	return author, nil
 }
 
-func (a *authorUsecase) FindAllAuthor() ([]model.Author, error) {
-	authors, err := a.authorRepository.List()
+func (a *authorUsecase) FindAllAuthor(id string) ([]model.Author, error) {
+	authors, err := a.authorRepository.List(id)
 	if err != nil {
 		return nil, err
 	}

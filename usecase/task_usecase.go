@@ -23,13 +23,10 @@ func (t *taskUsecase) RegisterNewTask(payload model.Task) (model.Task, error) {
 	if err != nil {
 		return model.Task{}, fmt.Errorf("user doesnt exist: %v", err)
 	}
-	if payload.Content == "" || payload.Title == "" {
-		return model.Task{}, fmt.Errorf("content or cannot be empty")
-	}
 
 	task, err := t.taskRepository.Create(payload)
 	if err != nil {
-		return model.Task{}, fmt.Errorf("failed to create task %v", err)
+		return model.Task{}, err
 	}
 	return task, nil
 }

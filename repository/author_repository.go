@@ -8,7 +8,7 @@ import (
 type AuthorRepository interface {
 	GetByEmail(email string) (model.Author, error)
 	Get(id string) (model.Author, error)
-	List() ([]model.Author, error)
+	List(id string) ([]model.Author, error)
 }
 
 type authorRepository struct {
@@ -45,7 +45,7 @@ func (a *authorRepository) GetByEmail(email string) (model.Author, error) {
 	return author, nil
 }
 
-func (t *authorRepository) List() ([]model.Author, error) {
+func (t *authorRepository) List(id string) ([]model.Author, error) {
 	var authors []model.Author
 	query := "SELECT id,name,email,created_at FROM authors"
 
