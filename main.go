@@ -53,7 +53,7 @@ func main() {
 	// } else {
 	// 	fmt.Println(task)
 	// }
-	author, err := authorRepository.Get("40af5ee7-5a6f-4193-9d6f-66e9d2cf12fb")
+	author, err := authorRepository.Get("40af5ee7-5a6f-4193-9d6f-66e9d2cf12fa")
 	if err != nil {
 		panic(err)
 	}
