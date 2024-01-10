@@ -3,7 +3,7 @@ package repository
 import (
 	"database/sql"
 	"log"
-	"todo-clean-arh/model"
+	"todo-clean-arch/model"
 )
 
 type TaskRepository interface {
@@ -24,7 +24,7 @@ func NewTaskRepository(db *sql.DB) TaskRepository {
 
 func (t *taskRepository) Create(payload model.Task) (model.Task, error) {
 	var task model.Task
-	err := t.db.QueryRow("INSERT INTO tasks (title, content,author_id) VALUES ($1 $2 $3) RETURNING id, created_at",
+	err := t.db.QueryRow("INSERT INTO tasks (title, content,author_id) VALUES ($1, $2, $3) RETURNING id, created_at",
 		payload.Title, payload.Content, payload.AuthorID).Scan(&task.ID, &task.CreatedAt)
 	if err != nil {
 		log.Println("taskRepository.QueryRow", err.Error())
