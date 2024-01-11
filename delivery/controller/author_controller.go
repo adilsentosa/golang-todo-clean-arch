@@ -7,24 +7,24 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type AuthorHandler struct {
+type AuthorController struct {
 	authorUC usecase.AuthorUsecase
 	rg       *gin.RouterGroup
 }
 
-func NewAuthorHandler(authorUC usecase.AuthorUsecase, rg *gin.RouterGroup) *AuthorHandler {
-	return &AuthorHandler{
+func NewAuthorHandler(authorUC usecase.AuthorUsecase, rg *gin.RouterGroup) *AuthorController {
+	return &AuthorController{
 		authorUC: authorUC,
 		rg:       rg,
 	}
 }
 
-func (a *AuthorHandler) Route() {
+func (a *AuthorController) Route() {
 	a.rg.GET("/authors/list/:id", a.ListAuthor)
 	a.rg.GET("/authors/:id", a.GetAuthor)
 }
 
-func (a *AuthorHandler) ListAuthor(c *gin.Context) {
+func (a *AuthorController) ListAuthor(c *gin.Context) {
 	id := c.Param("id")
 	authors, err := a.authorUC.FindAllAuthor(id)
 	if err != nil {
@@ -40,7 +40,7 @@ func (a *AuthorHandler) ListAuthor(c *gin.Context) {
 	})
 }
 
-func (a *AuthorHandler) GetAuthor(c *gin.Context) {
+func (a *AuthorController) GetAuthor(c *gin.Context) {
 	// if role admin muncul semua
 	// if role bukan admin,muncul task nya sendiri
 	id := c.Param("id")

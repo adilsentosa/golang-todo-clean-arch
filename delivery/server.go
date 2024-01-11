@@ -20,9 +20,11 @@ type Server struct {
 func (s *Server) initRoute() {
 	rg := s.engine.Group("/api/v1")
 	controller.NewAuthorHandler(s.authorUC, rg).Route()
+	controller.NewTaskHandler(s.taskUC, rg).Route()
 }
 
 func (s *Server) Run() {
+	s.initRoute()
 	if err := s.engine.Run(s.host); err != nil {
 		panic(fmt.Errorf("failed to start server %v", err))
 	}

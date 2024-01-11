@@ -3,26 +3,32 @@ package controller
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"todo-clean-arch/model"
 	"todo-clean-arch/usecase"
 
 	"github.com/gin-gonic/gin"
 )
 
-type TaskHandler struct {
+type TaskController struct {
 	taskUC usecase.TaskUsecase
+	rg     *gin.RouterGroup
 }
 
-func NewTaskHandler(taskUC usecase.TaskUsecase) *TaskHandler {
-	return &TaskHandler{
+func NewTaskHandler(taskUC usecase.TaskUsecase, rg *gin.RouterGroup) *TaskController {
+	return &TaskController{
 		taskUC: taskUC,
+		rg:     rg,
 	}
 }
 
-func (t *TaskHandler) Route() {
+func (t *TaskController) Route() {
+	t.rg.GET("/tasks/list", t.ListHandler)
+	t.rg.GET("/tasks/get/:id", t.FindTaskByAuthor)
+	t.rg.POST("/tasks/create", t.CreateHandler)
 }
 
-func (a *TaskHandler) CreateHandler(c *gin.Context) {
+func (a *TaskController) CreateHandler(c *gin.Context) {
 	var task model.Task
 	if err := c.ShouldBind(&task); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -55,7 +61,7 @@ func (a *TaskHandler) CreateHandler(c *gin.Context) {
 	})
 }
 
-func (a *TaskHandler) FindTaskByAuthor(c *gin.Context) {
+func (a *TaskController) FindTaskByAuthor(c *gin.Context) {
 	author := c.Param("id")
 	tasks, err := a.taskUC.FindTaskByAuthor(author)
 	if err != nil {
@@ -68,5 +74,27 @@ func (a *TaskHandler) FindTaskByAuthor(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "success",
 		"data":    tasks,
+	})
+}
+
+func (t *TaskController) ListHandler(c *gin.Context) {
+	page, _ := strconv.Atoi(c.Query("page"))
+	size, _ := strconv.Atoi(c.Query("size"))
+	tasks, paging, err := t.taskUC.FindAllTask(page, size)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"code":    http.StatusInternalServerError,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": gin.H{
+			"code":    http.StatusOK,
+			"message": "Ok",
+		},
+		"data":   tasks,
+		"paging": paging,
 	})
 }

@@ -13,4 +13,5 @@ type SingleResponse struct {
 type PagedResponse struct {
 	Status Status      `json:"status"`
 	Data   interface{} `json:"data"`
+	Paging Paging      `json:"paging"`
 }
