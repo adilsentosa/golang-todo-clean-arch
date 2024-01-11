@@ -26,7 +26,7 @@ func (a *AuthorController) Route() {
 	a.rg.GET("/authors/list/:id", a.ListAuthor)
 	a.rg.GET("/authors/:id", a.GetAuthor)
 	a.rg.PUT("/authors/:id", a.UpdateAuthor)
-	a.rg.DELETE("/authors/:id")
+	a.rg.DELETE("/authors/:id", a.RemoveAuthor)
 }
 
 func (a *AuthorController) RemoveAuthor(c *gin.Context) {
