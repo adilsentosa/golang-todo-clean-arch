@@ -49,4 +49,8 @@ const (
 
 	SelectTaskPagination = `SELECT id,title,content,author_id,created_at 
   FROM tasks ORDER BY created_at DESC LIMIT $1 OFFSET $2`
+
+	UpdateAuthorByID = `UPDATE authors SET name=$2, email=$3, password=$4, role=$5, updated_at=$6 WHERE id = $1`
+
+	DeleteAuthorByID = "DELETE FROM authors WHERE id = $1"
 )

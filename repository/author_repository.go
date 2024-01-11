@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"fmt"
+	"time"
 	"todo-clean-arch/config"
 	"todo-clean-arch/model"
 )
@@ -11,6 +12,8 @@ type AuthorRepository interface {
 	GetByEmail(email string) (model.Author, error)
 	Get(id string) (model.Author, error)
 	List(id string) ([]model.Author, error)
+	Update(author model.Author) (model.Author, error)
+	Delete(id string) error
 }
 
 type authorRepository struct {
@@ -21,6 +24,29 @@ func NewAuthorRepository(db *sql.DB) AuthorRepository {
 	return &authorRepository{
 		db: db,
 	}
+}
+
+func (a *authorRepository) Delete(id string) error {
+	query := config.DeleteAuthorByID
+	_, err := a.db.Exec(query, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a *authorRepository) Update(author model.Author) (model.Author, error) {
+	query := config.UpdateAuthorByID
+	currentTime := time.Now()
+	author.UpdatedAt = &currentTime
+
+	_, err := a.db.Exec(query, author.ID, author.Name, author.Email, author.Password, author.Role, author.UpdatedAt)
+	if err != nil {
+		return model.Author{}, err
+	}
+
+	return author, nil
 }
 
 func (a *authorRepository) Get(id string) (model.Author, error) {
