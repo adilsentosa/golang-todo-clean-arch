@@ -19,6 +19,9 @@ func NewTaskHandler(taskUC usecase.TaskUsecase) *TaskHandler {
 	}
 }
 
+func (t *TaskHandler) Route() {
+}
+
 func (a *TaskHandler) CreateHandler(c *gin.Context) {
 	var task model.Task
 	if err := c.ShouldBind(&task); err != nil {

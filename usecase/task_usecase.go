@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"todo-clean-arch/model"
 	"todo-clean-arch/repository"
+	sharedmodel "todo-clean-arch/shared/shared_model"
 )
 
 type TaskUsecase interface {
 	RegisterNewTask(payload model.Task) (model.Task, error)
 	FindTaskByAuthor(id string) ([]model.Task, error)
-	FindAllTask() ([]model.Task, error)
+	FindAllTask(page int, size int) ([]model.Task, sharedmodel.Paging, error)
 }
 
 type taskUsecase struct {
@@ -39,12 +40,12 @@ func (t *taskUsecase) FindTaskByAuthor(id string) ([]model.Task, error) {
 	return task, nil
 }
 
-func (t *taskUsecase) FindAllTask() ([]model.Task, error) {
-	tasks, err := t.taskRepository.List()
+func (t *taskUsecase) FindAllTask(page int, size int) ([]model.Task, sharedmodel.Paging, error) {
+	tasks, paging, err := t.taskRepository.List(page, size)
 	if err != nil {
-		return nil, err
+		return nil, paging, err
 	}
-	return tasks, nil
+	return tasks, paging, nil
 }
 
 func NewTaskUseCase(taskRepository repository.TaskRepository, authorUC AuthorUsecase) TaskUsecase {

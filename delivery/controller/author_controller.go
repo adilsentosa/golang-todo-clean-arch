@@ -9,12 +9,19 @@ import (
 
 type AuthorHandler struct {
 	authorUC usecase.AuthorUsecase
+	rg       *gin.RouterGroup
 }
 
-func NewAuthorHandler(authorUC usecase.AuthorUsecase) *AuthorHandler {
+func NewAuthorHandler(authorUC usecase.AuthorUsecase, rg *gin.RouterGroup) *AuthorHandler {
 	return &AuthorHandler{
 		authorUC: authorUC,
+		rg:       rg,
 	}
+}
+
+func (a *AuthorHandler) Route() {
+	a.rg.GET("/authors/list/:id", a.ListAuthor)
+	a.rg.GET("/authors/:id", a.GetAuthor)
 }
 
 func (a *AuthorHandler) ListAuthor(c *gin.Context) {

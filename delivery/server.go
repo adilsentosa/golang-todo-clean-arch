@@ -3,6 +3,7 @@ package delivery
 import (
 	"fmt"
 	"todo-clean-arch/config"
+	"todo-clean-arch/delivery/controller"
 	"todo-clean-arch/repository"
 	"todo-clean-arch/usecase"
 
@@ -14,6 +15,11 @@ type Server struct {
 	taskUC   usecase.TaskUsecase
 	engine   *gin.Engine
 	host     string
+}
+
+func (s *Server) initRoute() {
+	rg := s.engine.Group("/api/v1")
+	controller.NewAuthorHandler(s.authorUC, rg).Route()
 }
 
 func (s *Server) Run() {
