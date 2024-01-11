@@ -5,6 +5,7 @@ import (
 	"log"
 	"math"
 	"time"
+	"todo-clean-arch/config"
 	"todo-clean-arch/model"
 	sharedmodel "todo-clean-arch/shared/shared_model"
 )
@@ -29,7 +30,7 @@ func (t *taskRepository) Create(payload model.Task) (model.Task, error) {
 	var task model.Task
 	currTime := time.Now()
 	payload.UpdatedAt = &currTime
-	err := t.db.QueryRow("INSERT INTO tasks (title, content,author_id,updated_at) VALUES ($1, $2, $3, $4) RETURNING id, created_at",
+	err := t.db.QueryRow(config.InsertIntoTask,
 		payload.Title, payload.Content, payload.AuthorID, payload.UpdatedAt).Scan(&task.ID, &task.CreatedAt)
 	if err != nil {
 		log.Println("taskRepository.QueryRow", err.Error())
@@ -44,7 +45,7 @@ func (t *taskRepository) Create(payload model.Task) (model.Task, error) {
 
 func (t *taskRepository) GetByAuthorID(authorID string) ([]model.Task, error) {
 	var tasks []model.Task
-	query := "SELECT id,title,content,created_at,updated_at FROM tasks WHERE author_id = $1"
+	query := config.SelectTaskByAuthorID
 
 	rows, err := t.db.Query(query, authorID)
 	if err != nil {
@@ -68,8 +69,7 @@ func (t *taskRepository) GetByAuthorID(authorID string) ([]model.Task, error) {
 func (t *taskRepository) List(page int, size int) ([]model.Task, sharedmodel.Paging, error) {
 	var tasks []model.Task
 	offset := (page - 1) * size
-	query := `SELECT id,title,content,author_id,created_at 
-  FROM tasks ORDER BY created_at DESC LIMIT $1 OFFSET $2`
+	query := config.SelectTaskPagination
 
 	rows, err := t.db.Query(query, offset)
 	if err != nil {
