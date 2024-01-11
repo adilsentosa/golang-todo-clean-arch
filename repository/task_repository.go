@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"log"
+	"time"
 	"todo-clean-arch/model"
 )
 
@@ -24,8 +25,10 @@ func NewTaskRepository(db *sql.DB) TaskRepository {
 
 func (t *taskRepository) Create(payload model.Task) (model.Task, error) {
 	var task model.Task
-	err := t.db.QueryRow("INSERT INTO tasks (title, content,author_id) VALUES ($1, $2, $3) RETURNING id, created_at",
-		payload.Title, payload.Content, payload.AuthorID).Scan(&task.ID, &task.CreatedAt)
+	currTime := time.Now()
+	payload.UpdatedAt = &currTime
+	err := t.db.QueryRow("INSERT INTO tasks (title, content,author_id,updated_at) VALUES ($1, $2, $3, $4) RETURNING id, created_at",
+		payload.Title, payload.Content, payload.AuthorID, payload.UpdatedAt).Scan(&task.ID, &task.CreatedAt)
 	if err != nil {
 		log.Println("taskRepository.QueryRow", err.Error())
 		return model.Task{}, err
@@ -33,12 +36,13 @@ func (t *taskRepository) Create(payload model.Task) (model.Task, error) {
 	task.Title = payload.Title
 	task.Content = payload.Content
 	task.AuthorID = payload.AuthorID
+	task.UpdatedAt = payload.UpdatedAt
 	return task, nil
 }
 
 func (t *taskRepository) GetByAuthorID(authorID string) ([]model.Task, error) {
 	var tasks []model.Task
-	query := "SELECT id,title,content,created_at FROM tasks WHERE author_id = $1"
+	query := "SELECT id,title,content,created_at,updated_at FROM tasks WHERE author_id = $1"
 
 	rows, err := t.db.Query(query, authorID)
 	if err != nil {
@@ -49,7 +53,7 @@ func (t *taskRepository) GetByAuthorID(authorID string) ([]model.Task, error) {
 	for rows.Next() {
 		var task model.Task
 		task.AuthorID = authorID
-		err := rows.Scan(&task.ID, &task.Title, &task.Content, &task.CreatedAt)
+		err := rows.Scan(&task.ID, &task.Title, &task.Content, &task.CreatedAt, &task.UpdatedAt)
 		if err != nil {
 			return nil, err
 		}

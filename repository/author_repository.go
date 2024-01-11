@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"fmt"
 	"todo-clean-arch/model"
 )
 
@@ -23,9 +24,9 @@ func NewAuthorRepository(db *sql.DB) AuthorRepository {
 
 func (a *authorRepository) Get(id string) (model.Author, error) {
 	var author model.Author
-	query := "SELECT id,name,email,created_at FROM authors WHERE id = $1"
+	query := "SELECT id,name,email,created_at,updated_at FROM authors WHERE id = $1"
 
-	err := a.db.QueryRow(query, id).Scan(&author.ID, &author.Name, &author.Email, &author.CreatedAt)
+	err := a.db.QueryRow(query, id).Scan(&author.ID, &author.Name, &author.Email, &author.CreatedAt, &author.UpdatedAt)
 	if err != nil {
 		return model.Author{}, err
 	}
@@ -33,11 +34,51 @@ func (a *authorRepository) Get(id string) (model.Author, error) {
 	return author, nil
 }
 
+// func (a *authorRepository) Get(id string) (model.Author, error) {
+// 	var author model.Author
+// 	// query := "SELECT id,name,email,created_at,updated_at FROM authors WHERE id = $1"
+// 	query := `SELECT
+// 	  a.id,
+// 	  a.name,
+// 	  a.email,
+//     a.updated_at,
+// 	  a.created_at,
+// 	  array_agg(
+// 		  jsonb_build_object(
+// 			  'id', t.id,
+// 			  'title', t.title,
+// 			  'content', t.content,
+// 			  'author_ID', t.author_id,
+// 			  'created_at', t.created_at
+// 		  )
+// 	  ) AS tasks
+//   FROM authors a
+//   JOIN tasks t  ON a.id = t.author_id
+//   WHERE a.id = $1
+//   GROUP BY a.id,a.name, a.email,a.created_at,a.updated_at`
+// 	var tasks []model.Task
+// 	// var tasks []map[string]interface{}
+// 	var stringTasks string
+//
+// 	err := a.db.QueryRow(query, id).Scan(&author.ID, &author.Name, &author.Email, &author.CreatedAt, &author.UpdatedAt, &stringTasks)
+// 	if err != nil {
+// 		return model.Author{}, err
+// 	}
+// 	err = json.Unmarshal([]byte(stringTasks), &tasks)
+// 	if err != nil {
+// 		fmt.Println(err.Error())
+// 	}
+// 	fmt.Printf("%v", stringTasks)
+// 	fmt.Println()
+// 	fmt.Println(tasks)
+//
+// 	return author, nil
+// }
+
 func (a *authorRepository) GetByEmail(email string) (model.Author, error) {
 	var author model.Author
-	query := "SELECT id,name,email,created_at FROM authors WHERE email = $1"
-
-	err := a.db.QueryRow(query, email).Scan(&author.ID, &author.Name, &author.Email, &author.CreatedAt)
+	query := "SELECT id,name,email,created_at, updated_at FROM authors WHERE email = $1"
+	err := a.db.QueryRow(query, email).Scan(&author.ID, &author.Name, &author.Email, &author.CreatedAt, &author.UpdatedAt)
 	if err != nil {
 		return model.Author{}, err
 	}
@@ -46,23 +87,71 @@ func (a *authorRepository) GetByEmail(email string) (model.Author, error) {
 }
 
 func (t *authorRepository) List(id string) ([]model.Author, error) {
-	var authors []model.Author
-	query := "SELECT id,name,email,created_at FROM authors"
+	query := ""
 
-	rows, err := t.db.Query(query)
+	queryDefault := `SELECT
+	  a.id,
+	  a.name,
+	  a.email,
+    a.role,
+    a.updated_at,
+	  a.created_at,
+	  t.id  as t_id,
+	  t.title as t_title,
+	  t.content as t_content,
+    t.author_id as t_author_id,
+	  t.created_at as t_created_at,
+	  t.updated_at as t_updated_at
+  FROM
+	  authors a
+  JOIN
+	  tasks t  ON a.id = t.author_id`
+
+	var role string
+
+	queryAuthor := "SELECT role FROM authors WHERE id = $1"
+	var err error
+	err = t.db.QueryRow(queryAuthor, id).Scan(&role)
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("query author passed")
+	var rows *sql.Rows
+
+	if role == "admin" {
+		query = queryDefault + " ORDER BY a.email"
+		rows, err = t.db.Query(query)
+	} else {
+		query = queryDefault + " WHERE a.id = $1"
+		rows, err = t.db.Query(query, id)
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println("query all passed")
 	defer rows.Close()
 
+	authors := make(map[string]*model.Author)
+
 	for rows.Next() {
+		var task model.Task
 		var author model.Author
-		err := rows.Scan(&author.ID, &author.Name, &author.Email, &author.CreatedAt)
+		err := rows.Scan(&author.ID, &author.Name, &author.Email, &author.Role, &author.CreatedAt, &author.UpdatedAt, &task.ID, &task.Title,
+			&task.Content, &task.AuthorID, &task.CreatedAt, &task.UpdatedAt)
 		if err != nil {
 			return nil, err
 		}
-		authors = append(authors, author)
+		if _, ok := authors[author.ID]; !ok {
+			authors[author.ID] = &author
+		}
+		authors[author.ID].Tasks = append(authors[author.ID].Tasks, task)
 	}
 
-	return authors, nil
+	authorSlice := make([]model.Author, 0, len(authors))
+	for _, author := range authors {
+		authorSlice = append(authorSlice, *author)
+	}
+
+	return authorSlice, nil
 }

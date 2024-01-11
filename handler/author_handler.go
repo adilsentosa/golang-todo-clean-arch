@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 	"todo-clean-arch/usecase"
 
@@ -23,7 +22,7 @@ func (a *AuthorHandler) ListAuthor(c *gin.Context) {
 	authors, err := a.authorUC.FindAllAuthor(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": fmt.Errorf("failed to get author %v", err),
+			"message": "failed to get author" + err.Error(),
 		})
 		return
 	}

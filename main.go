@@ -32,7 +32,7 @@ func main() {
 
 	authors := route.Group("/api/v1/authors")
 	{
-		authors.GET("/list", authorHanlder.ListAuthor)
+		authors.GET("/list/:id", authorHanlder.ListAuthor)
 		authors.GET("/:id", authorHanlder.GetAuthor)
 	}
 

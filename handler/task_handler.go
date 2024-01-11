@@ -30,7 +30,8 @@ func (a *TaskHandler) CreateHandler(c *gin.Context) {
 
 	if task.AuthorID == "" || task.Title == "" || task.Content == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": fmt.Errorf("AuthorID or title or content is empty"),
+			"code":    http.StatusBadRequest,
+			"message": "AuthorID or title or content is empty",
 		})
 		return
 	}
@@ -39,7 +40,7 @@ func (a *TaskHandler) CreateHandler(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    http.StatusBadRequest,
-			"message": fmt.Errorf("failed to create task %v", err),
+			"message": "failed to create task %v " + err.Error(),
 		})
 		return
 	}
@@ -56,7 +57,7 @@ func (a *TaskHandler) FindTaskByAuthor(c *gin.Context) {
 	tasks, err := a.taskUC.FindTaskByAuthor(author)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"message": "task with author ID " + author + " not found",
+			"message": "task with authorID: " + author + " not found",
 		})
 		return
 	}
