@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"fmt"
+	"todo-clean-arch/config"
 	"todo-clean-arch/model"
 )
 
@@ -24,7 +25,7 @@ func NewAuthorRepository(db *sql.DB) AuthorRepository {
 
 func (a *authorRepository) Get(id string) (model.Author, error) {
 	var author model.Author
-	query := "SELECT id,name,email,created_at,updated_at FROM authors WHERE id = $1"
+	query := config.SelectAuthorById
 
 	err := a.db.QueryRow(query, id).Scan(&author.ID, &author.Name, &author.Email, &author.CreatedAt, &author.UpdatedAt)
 	if err != nil {
@@ -77,7 +78,7 @@ func (a *authorRepository) Get(id string) (model.Author, error) {
 
 func (a *authorRepository) GetByEmail(email string) (model.Author, error) {
 	var author model.Author
-	query := "SELECT id,name,email,created_at, updated_at FROM authors WHERE email = $1"
+	query := config.SelectAuthorByEmail
 	err := a.db.QueryRow(query, email).Scan(&author.ID, &author.Name, &author.Email, &author.CreatedAt, &author.UpdatedAt)
 	if err != nil {
 		return model.Author{}, err
@@ -88,25 +89,6 @@ func (a *authorRepository) GetByEmail(email string) (model.Author, error) {
 
 func (t *authorRepository) List(id string) ([]model.Author, error) {
 	query := ""
-
-	queryDefault := `SELECT
-	  a.id,
-	  a.name,
-	  a.email,
-    a.role,
-    a.updated_at,
-	  a.created_at,
-	  t.id  as t_id,
-	  t.title as t_title,
-	  t.content as t_content,
-    t.author_id as t_author_id,
-	  t.created_at as t_created_at,
-	  t.updated_at as t_updated_at
-  FROM
-	  authors a
-  JOIN
-	  tasks t  ON a.id = t.author_id`
-
 	var role string
 
 	queryAuthor := "SELECT role FROM authors WHERE id = $1"
@@ -119,10 +101,10 @@ func (t *authorRepository) List(id string) ([]model.Author, error) {
 	var rows *sql.Rows
 
 	if role == "admin" {
-		query = queryDefault + " ORDER BY a.email"
+		query = config.SelectAuthorWithTasks
 		rows, err = t.db.Query(query)
 	} else {
-		query = queryDefault + " WHERE a.id = $1"
+		query = config.SelectAuthorWithTasksByID
 		rows, err = t.db.Query(query, id)
 	}
 	if err != nil {
