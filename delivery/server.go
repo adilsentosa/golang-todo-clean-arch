@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"fmt"
+	"log"
 	"todo-clean-arch/config"
 	"todo-clean-arch/delivery/controller"
 	"todo-clean-arch/repository"
@@ -32,6 +33,10 @@ func (s *Server) Run() {
 
 func NewServer() *Server {
 	db := config.ConnectDB()
+	cfg, err := config.NewConfig()
+	if err != nil {
+		log.Fatal(fmt.Errorf("config error: %v", err))
+	}
 
 	taskRepository := repository.NewTaskRepository(db)
 	authorRepository := repository.NewAuthorRepository(db)
@@ -39,7 +44,7 @@ func NewServer() *Server {
 	taskUseCase := usecase.NewTaskUseCase(taskRepository, authorUseCase)
 
 	engine := gin.Default()
-	host := fmt.Sprintf(":%s", "8080")
+	host := fmt.Sprintf(":%s", cfg.ApiPort)
 
 	return &Server{
 		authorUC: authorUseCase,
