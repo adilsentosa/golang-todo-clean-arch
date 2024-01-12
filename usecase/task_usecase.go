@@ -18,6 +18,13 @@ type taskUsecase struct {
 	authorUC       AuthorUsecase
 }
 
+func NewTaskUseCase(taskRepository repository.TaskRepository, authorUC AuthorUsecase) TaskUsecase {
+	return &taskUsecase{
+		taskRepository: taskRepository,
+		authorUC:       authorUC,
+	}
+}
+
 func (t *taskUsecase) RegisterNewTask(payload model.Task) (model.Task, error) {
 	// Validate payload
 	_, err := t.authorUC.FindAuthorByID(payload.AuthorID)
@@ -46,11 +53,4 @@ func (t *taskUsecase) FindAllTask(page int, size int) ([]model.Task, sharedmodel
 		return nil, paging, err
 	}
 	return tasks, paging, nil
-}
-
-func NewTaskUseCase(taskRepository repository.TaskRepository, authorUC AuthorUsecase) TaskUsecase {
-	return &taskUsecase{
-		taskRepository: taskRepository,
-		authorUC:       authorUC,
-	}
 }

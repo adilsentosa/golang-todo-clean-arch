@@ -71,7 +71,7 @@ func (t *taskRepository) List(page int, size int) ([]model.Task, sharedmodel.Pag
 	offset := (page - 1) * size
 	query := config.SelectTaskPagination
 
-	rows, err := t.db.Query(query, offset)
+	rows, err := t.db.Query(query, size, offset)
 	if err != nil {
 		log.Println("taskRepository.Query:", err.Error())
 		return nil, sharedmodel.Paging{}, err
