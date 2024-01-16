@@ -44,9 +44,9 @@ func NewServer() *Server {
 	taskRepository := repository.NewTaskRepository(db)
 	authorRepository := repository.NewAuthorRepository(db)
 	authorUseCase := usecase.NewAuthorUseCase(authorRepository)
-	taskUseCase := usecase.NewTaskUseCase(taskRepository, authorUseCase)
-	jwtService := service.NewJwtService()
+	jwtService := service.NewJwtService(cfg.TokenConfig)
 	authUC := usecase.NewAuthUseCase(authorUseCase, jwtService)
+	taskUseCase := usecase.NewTaskUseCase(taskRepository, authorUseCase, authUC)
 
 	engine := gin.Default()
 	host := fmt.Sprintf(":%s", cfg.ApiPort)

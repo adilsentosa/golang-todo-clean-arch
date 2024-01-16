@@ -8,11 +8,16 @@ import (
 
 type AuthUseCase interface {
 	Login(payload dto.AuthRequestDTO) (dto.AuthResponseDTO, error)
+	GetKey() []byte
 }
 
 type authUseCase struct {
 	authorUC   AuthorUsecase
 	jwtService service.JwtService
+}
+
+func (a *authUseCase) GetKey() []byte {
+	return a.jwtService.GetKey()
 }
 
 func (a *authUseCase) Login(payload dto.AuthRequestDTO) (dto.AuthResponseDTO, error) {

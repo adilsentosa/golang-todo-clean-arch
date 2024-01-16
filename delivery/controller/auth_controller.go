@@ -30,6 +30,7 @@ func (a *AuthController) loginHandler(c *gin.Context) {
 		common.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
+	c.SetCookie("token", response.Token, 3600, "/", "localhost", false, true)
 	common.SendSingleResponse(c, response, "login success")
 }
 

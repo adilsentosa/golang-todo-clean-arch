@@ -13,10 +13,15 @@ import (
 
 type JwtService interface {
 	GenerateToken(author model.Author) (dto.AuthResponseDTO, error)
+	GetKey() []byte
 }
 
 type jwtService struct {
 	cfg config.TokenConfig
+}
+
+func (j *jwtService) GetKey() []byte {
+	return j.cfg.JwtSignatureKey
 }
 
 func (j *jwtService) GenerateToken(author model.Author) (dto.AuthResponseDTO, error) {
@@ -41,6 +46,8 @@ func (j *jwtService) GenerateToken(author model.Author) (dto.AuthResponseDTO, er
 	}, nil
 }
 
-func NewJwtService() JwtService {
-	return &jwtService{}
+func NewJwtService(cfg config.TokenConfig) JwtService {
+	return &jwtService{
+		cfg: cfg,
+	}
 }

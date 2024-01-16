@@ -16,12 +16,14 @@ type TaskUsecase interface {
 type taskUsecase struct {
 	taskRepository repository.TaskRepository
 	authorUC       AuthorUsecase
+	authUC         AuthUseCase
 }
 
-func NewTaskUseCase(taskRepository repository.TaskRepository, authorUC AuthorUsecase) TaskUsecase {
+func NewTaskUseCase(taskRepository repository.TaskRepository, authorUC AuthorUsecase, authUC AuthUseCase) TaskUsecase {
 	return &taskUsecase{
 		taskRepository: taskRepository,
 		authorUC:       authorUC,
+		authUC:         authUC,
 	}
 }
 
