@@ -1,13 +1,17 @@
 package usecase
 
-import "todo-clean-arch/model/dto"
+import (
+	"todo-clean-arch/model/dto"
+	"todo-clean-arch/shared/service"
+)
 
 type AuthUseCase interface {
 	Login(payload dto.AuthRequestDTO) (dto.AuthResponseDTO, error)
 }
 
 type authUseCase struct {
-	authorUC AuthorUsecase
+	authorUC   AuthorUsecase
+	jwtService service.JwtService
 }
 
 func (a *authUseCase) Login(payload dto.AuthRequestDTO) (dto.AuthResponseDTO, error) {
@@ -21,11 +25,13 @@ func (a *authUseCase) Login(payload dto.AuthRequestDTO) (dto.AuthResponseDTO, er
 	}
 
 	// TODO generate jwt
-	return dto.AuthResponseDTO{Token: ""}, nil
+	tokenDto, err := a.jwtService.GenerateToken(author)
+	return dto.AuthResponseDTO{Token: tokenDto.Token}, nil
 }
 
-func NewAuthUseCase(authorUC AuthorUsecase) AuthUseCase {
+func NewAuthUseCase(authorUC AuthorUsecase, jwtService service.JwtService) AuthUseCase {
 	return &authUseCase{
-		authorUC: authorUC,
+		authorUC:   authorUC,
+		jwtService: jwtService,
 	}
 }

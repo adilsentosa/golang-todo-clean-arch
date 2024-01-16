@@ -6,6 +6,7 @@ import (
 	"todo-clean-arch/config"
 	"todo-clean-arch/delivery/controller"
 	"todo-clean-arch/repository"
+	"todo-clean-arch/shared/service"
 	"todo-clean-arch/usecase"
 
 	"github.com/gin-gonic/gin"
@@ -14,6 +15,7 @@ import (
 type Server struct {
 	authorUC usecase.AuthorUsecase
 	taskUC   usecase.TaskUsecase
+	authUC   usecase.AuthUseCase
 	engine   *gin.Engine
 	host     string
 }
@@ -22,7 +24,7 @@ func (s *Server) initRoute() {
 	rg := s.engine.Group("/api/v1")
 	controller.NewAuthorHandler(s.authorUC, rg).Route()
 	controller.NewTaskHandler(s.taskUC, rg).Route()
-	controller.NerAuthController()
+	controller.NewAuthController(s.authUC, rg).Route()
 }
 
 func (s *Server) Run() {
@@ -43,6 +45,8 @@ func NewServer() *Server {
 	authorRepository := repository.NewAuthorRepository(db)
 	authorUseCase := usecase.NewAuthorUseCase(authorRepository)
 	taskUseCase := usecase.NewTaskUseCase(taskRepository, authorUseCase)
+	jwtService := service.NewJwtService()
+	authUC := usecase.NewAuthUseCase(authorUseCase, jwtService)
 
 	engine := gin.Default()
 	host := fmt.Sprintf(":%s", cfg.ApiPort)
@@ -50,6 +54,7 @@ func NewServer() *Server {
 	return &Server{
 		authorUC: authorUseCase,
 		taskUC:   taskUseCase,
+		authUC:   authUC,
 		engine:   engine,
 		host:     host,
 	}
