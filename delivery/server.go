@@ -22,6 +22,7 @@ func (s *Server) initRoute() {
 	rg := s.engine.Group("/api/v1")
 	controller.NewAuthorHandler(s.authorUC, rg).Route()
 	controller.NewTaskHandler(s.taskUC, rg).Route()
+	controller.NerAuthController()
 }
 
 func (s *Server) Run() {
