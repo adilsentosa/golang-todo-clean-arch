@@ -19,13 +19,14 @@ func (a *AuthController) loginHandler(c *gin.Context) {
 	fmt.Println("hit loginHandler")
 	var payload dto.AuthRequestDTO
 	err := c.ShouldBindJSON(&payload)
+	fmt.Println(payload)
 	if err != nil {
 		common.SendErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 	// send payload to usecase
-	fmt.Println("call Login method from authUC")
 	response, err := a.authUC.Login(payload)
+	fmt.Println(response)
 	if err != nil {
 		common.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return

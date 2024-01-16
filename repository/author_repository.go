@@ -107,7 +107,7 @@ func (a *authorRepository) GetJson(id string) (model.Author, error) {
 func (a *authorRepository) GetByEmail(email string) (model.Author, error) {
 	var author model.Author
 	query := config.SelectAuthorByEmail
-	err := a.db.QueryRow(query, email).Scan(&author.ID, &author.Name, &author.Email, &author.CreatedAt, &author.UpdatedAt)
+	err := a.db.QueryRow(query, email).Scan(&author.ID, &author.Name, &author.Email, &author.Password, &author.CreatedAt, &author.UpdatedAt)
 	if err != nil {
 		return model.Author{}, err
 	}

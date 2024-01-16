@@ -21,14 +21,19 @@ func (a *authUseCase) GetKey() []byte {
 }
 
 func (a *authUseCase) Login(payload dto.AuthRequestDTO) (dto.AuthResponseDTO, error) {
+	// fmt.Println("authUC Login")
+	// fmt.Println(payload)
 	author, err := a.authorUC.FindAuthorByEmail(payload.Email)
 	if err != nil {
 		return dto.AuthResponseDTO{}, err
 	}
+	log.Println("authUC.FindAuthorByEmail", author)
+	log.Println(payload.Password == author.Password)
 
-	if author.Password != payload.Password {
+	if payload.Password != author.Password {
 		return dto.AuthResponseDTO{}, err
 	}
+	log.Println("password correct")
 
 	// TODO generate jwt
 	tokenDto, err := a.jwtService.GenerateToken(author)

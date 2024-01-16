@@ -2,7 +2,7 @@ package config
 
 const (
 	SelectAuthorById      = "SELECT id,name,email,created_at,updated_at FROM authors WHERE id = $1"
-	SelectAuthorByEmail   = "SELECT id,name,email,created_at, updated_at FROM authors WHERE email = $1"
+	SelectAuthorByEmail   = "SELECT id,name,email,password,created_at, updated_at FROM authors WHERE email = $1"
 	SelectAuthorWithTasks = `
   SELECT
 	  a.id,

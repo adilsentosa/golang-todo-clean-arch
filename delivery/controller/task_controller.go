@@ -30,8 +30,7 @@ func (t *TaskController) Route() {
 	t.rg.GET("/tasks/list", t.ListHandler)
 	t.rg.GET("/tasks/get/:id", t.FindTaskByAuthor)
 	t.rg.POST("/tasks/create", t.CreateHandler)
-	t.rg.Use(middleware.DeleteTaskMiddleware(t.authUC.GetKey()))
-	t.rg.DELETE("/tasks/delete", t.DeleteHandler)
+	t.rg.DELETE("/tasks/delete/:id", middleware.DeleteTaskMiddleware(t.authUC.GetKey()), t.DeleteHandler)
 }
 
 func (t *TaskController) DeleteHandler(c *gin.Context) {

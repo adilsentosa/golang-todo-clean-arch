@@ -23,7 +23,7 @@ type Server struct {
 func (s *Server) initRoute() {
 	rg := s.engine.Group("/api/v1")
 	controller.NewAuthorHandler(s.authorUC, rg).Route()
-	controller.NewTaskHandler(s.taskUC, rg).Route()
+	controller.NewTaskHandler(s.taskUC, rg, s.authUC).Route()
 	controller.NewAuthController(s.authUC, rg).Route()
 }
 
