@@ -29,7 +29,7 @@ func DeleteTaskMiddleware(jwtKey []byte) gin.HandlerFunc {
 			return
 		}
 
-		if c.FullPath() == "/admin" && getClaim.Role != "admin" {
+		if c.FullPath() == "/tasks/delete" && getClaim.Role != "admin" {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"error": "This route is only for admin",
 			})

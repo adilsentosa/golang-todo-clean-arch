@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"todo-clean-arch/delivery/middleware"
 	"todo-clean-arch/model"
+	"todo-clean-arch/shared/common"
 	"todo-clean-arch/usecase"
 
 	"github.com/gin-gonic/gin"
@@ -31,6 +32,20 @@ func (t *TaskController) Route() {
 	t.rg.POST("/tasks/create", t.CreateHandler)
 	t.rg.Use(middleware.DeleteTaskMiddleware(t.authUC.GetKey()))
 	t.rg.DELETE("/tasks/delete", t.DeleteHandler)
+}
+
+func (t *TaskController) DeleteHandler(c *gin.Context) {
+	id := c.Param("id")
+	err := t.taskUC.RemoveTask(id)
+	if err != nil {
+		common.SendErrorResponse(c, http.StatusBadRequest, fmt.Sprintf("failed to delete %v", err))
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "succes",
+	})
 }
 
 func (a *TaskController) CreateHandler(c *gin.Context) {

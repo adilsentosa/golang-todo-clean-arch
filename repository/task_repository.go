@@ -14,6 +14,7 @@ type TaskRepository interface {
 	Create(payload model.Task) (model.Task, error)
 	List(page int, size int) ([]model.Task, sharedmodel.Paging, error)
 	GetByAuthorID(authorID string) ([]model.Task, error)
+	Delete(taskID string) error
 }
 
 type taskRepository struct {
@@ -24,6 +25,16 @@ func NewTaskRepository(db *sql.DB) TaskRepository {
 	return &taskRepository{
 		db: db,
 	}
+}
+
+func (t *taskRepository) Delete(id string) error {
+	query := config.DeleteTaskByID
+	_, err := t.db.Exec(query, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (t *taskRepository) Create(payload model.Task) (model.Task, error) {

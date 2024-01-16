@@ -53,4 +53,5 @@ const (
 	UpdateAuthorByID = `UPDATE authors SET name=$2, email=$3, password=$4, role=$5, updated_at=$6 WHERE id = $1`
 
 	DeleteAuthorByID = "DELETE FROM authors WHERE id = $1"
+	DeleteTaskByID   = "DELETE FROM tasks WHERE ID = $1"
 )

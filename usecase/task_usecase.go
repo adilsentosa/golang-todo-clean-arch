@@ -11,12 +11,21 @@ type TaskUsecase interface {
 	RegisterNewTask(payload model.Task) (model.Task, error)
 	FindTaskByAuthor(id string) ([]model.Task, error)
 	FindAllTask(page int, size int) ([]model.Task, sharedmodel.Paging, error)
+	RemoveTask(id string) error
 }
 
 type taskUsecase struct {
 	taskRepository repository.TaskRepository
 	authorUC       AuthorUsecase
 	authUC         AuthUseCase
+}
+
+func (t *taskUsecase) RemoveTask(id string) error {
+	err := t.taskRepository.Delete(id)
+	if err != nil {
+		return fmt.Errorf("failed to delete %v", err)
+	}
+	return nil
 }
 
 func NewTaskUseCase(taskRepository repository.TaskRepository, authorUC AuthorUsecase, authUC AuthUseCase) TaskUsecase {
