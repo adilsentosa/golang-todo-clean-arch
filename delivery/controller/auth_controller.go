@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 	"todo-clean-arch/model/dto"
 	"todo-clean-arch/shared/common"
@@ -15,6 +16,7 @@ type AuthController struct {
 }
 
 func (a *AuthController) loginHandler(c *gin.Context) {
+	fmt.Println("hit loginHandler")
 	var payload dto.AuthRequestDTO
 	err := c.ShouldBindJSON(&payload)
 	if err != nil {
@@ -22,7 +24,13 @@ func (a *AuthController) loginHandler(c *gin.Context) {
 		return
 	}
 	// send payload to usecase
-	common.SendSingleResponse(c, nil, "login success")
+	fmt.Println("call Login method from authUC")
+	response, err := a.authUC.Login(payload)
+	if err != nil {
+		common.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	common.SendSingleResponse(c, response, "login success")
 }
 
 func (a *AuthController) Route() {

@@ -60,7 +60,7 @@ func (c *Config) InitialConfig() error {
 	tokenExpire, _ := strconv.Atoi(os.Getenv("TOKEN_EXPIRE"))
 	c.TokenConfig = TokenConfig{
 		IssuerName:       os.Getenv("ISSUER_NAME"),
-		JwtSignatureKey:  []byte(os.Getenv("JWT_SIGNATURE_KEY")),
+		JwtSignatureKey:  []byte(os.Getenv("SIGNATURE_KEY")),
 		JwtSigningMethod: jwt.SigningMethodHS256,
 		JwtExpiresTime:   time.Duration(tokenExpire) * time.Hour,
 	}

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"log"
 	"time"
 	"todo-clean-arch/config"
 	"todo-clean-arch/model"
@@ -19,7 +20,7 @@ type jwtService struct {
 }
 
 func (j *jwtService) GenerateToken(author model.Author) (dto.AuthResponseDTO, error) {
-	claims := sharedmodel.CustomeClaims{
+	claims := sharedmodel.CustomClaims{
 		AuthorID: author.ID,
 		Role:     author.Role,
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -30,6 +31,8 @@ func (j *jwtService) GenerateToken(author model.Author) (dto.AuthResponseDTO, er
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(j.cfg.JwtSignatureKey)
+	log.Println("tokenString:")
+	log.Println(tokenString)
 	if err != nil {
 		return dto.AuthResponseDTO{}, err
 	}

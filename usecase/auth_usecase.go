@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"log"
 	"todo-clean-arch/model/dto"
 	"todo-clean-arch/shared/service"
 )
@@ -26,7 +27,12 @@ func (a *authUseCase) Login(payload dto.AuthRequestDTO) (dto.AuthResponseDTO, er
 
 	// TODO generate jwt
 	tokenDto, err := a.jwtService.GenerateToken(author)
-	return dto.AuthResponseDTO{Token: tokenDto.Token}, nil
+	log.Println("TokenDto")
+	log.Println(tokenDto)
+	if err != nil {
+		return dto.AuthResponseDTO{}, err
+	}
+	return tokenDto, nil
 }
 
 func NewAuthUseCase(authorUC AuthorUsecase, jwtService service.JwtService) AuthUseCase {
