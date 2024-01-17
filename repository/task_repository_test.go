@@ -23,10 +23,10 @@ var expectedTask = model.Task{
 	Content:   "content",
 	AuthorID:  "1",
 	CreatedAt: time.Now(),
-	UpdatedAt: &time.Time{},
+	UpdatedAt: nil,
 }
 
-func (s *TaskRepositoryTestSuite) Setuptask() {
+func (s *TaskRepositoryTestSuite) SetupTask() {
 	db, mock, _ := sqlmock.New()
 	s.mockDB = db
 	s.mockSql = mock
