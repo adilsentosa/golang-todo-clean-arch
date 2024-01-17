@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"log"
 	"time"
 	"todo-clean-arch/config"
@@ -13,11 +14,27 @@ import (
 
 type JwtService interface {
 	GenerateToken(author model.Author) (dto.AuthResponseDTO, error)
+	ParseToken(tokenHeadr string) (jwt.MapClaims, error)
 	GetKey() []byte
 }
 
 type jwtService struct {
 	cfg config.TokenConfig
+}
+
+func (j *jwtService) ParseToken(tokenHeader string) (jwt.MapClaims, error) {
+	token, err := jwt.Parse(tokenHeader, func(token *jwt.Token) (interface{}, error) {
+		return j.cfg.JwtSignatureKey, nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("oops, failed to verify token")
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return nil, fmt.Errorf("oops, failed to claim token")
+	}
+	return claims, nil
 }
 
 func (j *jwtService) GetKey() []byte {
