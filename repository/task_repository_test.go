@@ -17,33 +17,39 @@ type TaskRepositoryTestSuite struct {
 	repo    TaskRepository
 }
 
-var expectedTask = model.Task{
-	ID:        "1",
-	Title:     "title",
-	Content:   "content",
-	AuthorID:  "1",
-	CreatedAt: time.Now(),
-	UpdatedAt: nil,
-}
+var (
+	// currentTime  = time.Now()
+	expectedTask = model.Task{
+		ID:        "1",
+		Title:     "title",
+		Content:   "content",
+		AuthorID:  "1",
+		CreatedAt: time.Now(),
+		UpdatedAt: &time.Time{},
+	}
+)
 
-func (s *TaskRepositoryTestSuite) SetupTask() {
+func (s *TaskRepositoryTestSuite) SetupTest() {
 	db, mock, _ := sqlmock.New()
 	s.mockDB = db
 	s.mockSql = mock
-	s.repo = NewTaskRepository(db)
+	s.repo = NewTaskRepository(s.mockDB)
 }
 
 func (s *TaskRepositoryTestSuite) TestCreate_Success() {
+	// s.SetupTask()
 	s.mockSql.ExpectQuery("INSERT INTO tasks").WithArgs(
 		expectedTask.Title,
 		expectedTask.Content,
 		expectedTask.AuthorID,
-	).WillReturnRows(sqlmock.NewRows([]string{"id", "created_at"}).AddRow(expectedTask.ID, expectedTask.CreatedAt))
+		expectedTask.UpdatedAt,
+	).WillReturnRows(sqlmock.NewRows([]string{"id", "created_at"}).
+		AddRow(expectedTask.ID, expectedTask.CreatedAt))
 	actual, err := s.repo.Create(expectedTask)
 	s.Nil(err)
 	s.Equal(expectedTask.Title, actual.Title)
 }
 
-func TestTaskRepositorySuite(t *testing.T) {
+func TestTaskRepositoryTestSuite(t *testing.T) {
 	suite.Run(t, new(TaskRepositoryTestSuite))
 }
