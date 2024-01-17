@@ -77,6 +77,7 @@ func (s *TaskUseCaseSuite) TestRegisterNewTask_EmptyField() {
 		Content:  "",
 		AuthorID: expectedTask.AuthorID,
 	}
+	s.trm.On("Create", payloadMock).Return(model.Task{}, fmt.Errorf("error"))
 	_, err := s.tuc.RegisterNewTask(payloadMock)
 	s.Error(err)
 	s.NotNil(err)
@@ -103,7 +104,7 @@ func (s *TaskUseCaseSuite) TestFindAllTask_Success() {
 	s.NoError(err)
 	s.Nil(err)
 	s.Equal(expectedTask.Title, actual[0].Title)
-	s.Len(actual, 0)
+	s.Len(actual, 1)
 	s.Equal(mockPaging, paging)
 }
 
