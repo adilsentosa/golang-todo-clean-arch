@@ -17,7 +17,6 @@ type TaskUsecase interface {
 type taskUsecase struct {
 	taskRepository repository.TaskRepository
 	authorUC       AuthorUsecase
-	authUC         AuthUseCase
 }
 
 func (t *taskUsecase) RemoveTask(id string) error {
@@ -28,11 +27,10 @@ func (t *taskUsecase) RemoveTask(id string) error {
 	return nil
 }
 
-func NewTaskUseCase(taskRepository repository.TaskRepository, authorUC AuthorUsecase, authUC AuthUseCase) TaskUsecase {
+func NewTaskUseCase(taskRepository repository.TaskRepository, authorUC AuthorUsecase) TaskUsecase {
 	return &taskUsecase{
 		taskRepository: taskRepository,
 		authorUC:       authorUC,
-		authUC:         authUC,
 	}
 }
 

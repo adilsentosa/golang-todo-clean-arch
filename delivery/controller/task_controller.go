@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"todo-clean-arch/delivery/middleware"
 	"todo-clean-arch/model"
 	"todo-clean-arch/shared/common"
 	"todo-clean-arch/usecase"
@@ -14,14 +13,12 @@ import (
 
 type TaskController struct {
 	taskUC usecase.TaskUsecase
-	authUC usecase.AuthUseCase
 	rg     *gin.RouterGroup
 }
 
-func NewTaskHandler(taskUC usecase.TaskUsecase, rg *gin.RouterGroup, authUC usecase.AuthUseCase) *TaskController {
+func NewTaskHandler(taskUC usecase.TaskUsecase, rg *gin.RouterGroup) *TaskController {
 	return &TaskController{
 		taskUC: taskUC,
-		authUC: authUC,
 		rg:     rg,
 	}
 }
@@ -30,7 +27,7 @@ func (t *TaskController) Route() {
 	t.rg.GET("/tasks/list", t.ListHandler)
 	t.rg.GET("/tasks/get/:id", t.FindTaskByAuthor)
 	t.rg.POST("/tasks/create", t.CreateHandler)
-	t.rg.DELETE("/tasks/delete/:id", middleware.DeleteTaskMiddleware(t.authUC.GetKey()), t.DeleteHandler)
+	t.rg.DELETE("/tasks/delete/:id", t.DeleteHandler)
 }
 
 func (t *TaskController) DeleteHandler(c *gin.Context) {

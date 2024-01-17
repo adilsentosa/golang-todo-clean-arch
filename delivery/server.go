@@ -23,7 +23,7 @@ type Server struct {
 func (s *Server) initRoute() {
 	rg := s.engine.Group("/api/v1")
 	controller.NewAuthorHandler(s.authorUC, rg).Route()
-	controller.NewTaskHandler(s.taskUC, rg, s.authUC).Route()
+	controller.NewTaskHandler(s.taskUC, rg).Route()
 	controller.NewAuthController(s.authUC, rg).Route()
 }
 
@@ -46,7 +46,7 @@ func NewServer() *Server {
 	authorUseCase := usecase.NewAuthorUseCase(authorRepository)
 	jwtService := service.NewJwtService(cfg.TokenConfig)
 	authUC := usecase.NewAuthUseCase(authorUseCase, jwtService)
-	taskUseCase := usecase.NewTaskUseCase(taskRepository, authorUseCase, authUC)
+	taskUseCase := usecase.NewTaskUseCase(taskRepository, authorUseCase)
 
 	engine := gin.Default()
 	host := fmt.Sprintf(":%s", cfg.ApiPort)
