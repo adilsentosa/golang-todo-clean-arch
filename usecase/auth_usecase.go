@@ -8,7 +8,7 @@ import (
 
 type AuthUseCase interface {
 	Login(payload dto.AuthRequestDTO) (dto.AuthResponseDTO, error)
-	GetKey() []byte
+	// GetKey() []byte
 }
 
 type authUseCase struct {
@@ -16,9 +16,9 @@ type authUseCase struct {
 	jwtService service.JwtService
 }
 
-func (a *authUseCase) GetKey() []byte {
-	return a.jwtService.GetKey()
-}
+// func (a *authUseCase) GetKey() []byte {
+// 	return a.jwtService.GetKey()
+// }
 
 func (a *authUseCase) Login(payload dto.AuthRequestDTO) (dto.AuthResponseDTO, error) {
 	// fmt.Println("authUC Login")

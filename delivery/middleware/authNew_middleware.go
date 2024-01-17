@@ -61,3 +61,7 @@ func (a *authMiddleware) RequireToken(roles ...string) gin.HandlerFunc {
 		ctx.Next()
 	}
 }
+
+func NewAuthMiddleware(jwtService service.JwtService) AuthMiddleware {
+	return &authMiddleware{jwtService: jwtService}
+}

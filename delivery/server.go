@@ -5,6 +5,7 @@ import (
 	"log"
 	"todo-clean-arch/config"
 	"todo-clean-arch/delivery/controller"
+	"todo-clean-arch/delivery/middleware"
 	"todo-clean-arch/repository"
 	"todo-clean-arch/shared/service"
 	"todo-clean-arch/usecase"
@@ -13,16 +14,18 @@ import (
 )
 
 type Server struct {
-	authorUC usecase.AuthorUsecase
-	taskUC   usecase.TaskUsecase
-	authUC   usecase.AuthUseCase
-	engine   *gin.Engine
-	host     string
+	authorUC   usecase.AuthorUsecase
+	taskUC     usecase.TaskUsecase
+	authUC     usecase.AuthUseCase
+	jwtService service.JwtService
+	engine     *gin.Engine
+	host       string
 }
 
 func (s *Server) initRoute() {
 	rg := s.engine.Group("/api/v1")
-	controller.NewAuthorHandler(s.authorUC, rg).Route()
+	authMiddleware := middleware.NewAuthMiddleware(s.jwtService)
+	controller.NewAuthorHandler(s.authorUC, rg, authMiddleware).Route()
 	controller.NewTaskHandler(s.taskUC, rg).Route()
 	controller.NewAuthController(s.authUC, rg).Route()
 }
@@ -52,10 +55,11 @@ func NewServer() *Server {
 	host := fmt.Sprintf(":%s", cfg.ApiPort)
 
 	return &Server{
-		authorUC: authorUseCase,
-		taskUC:   taskUseCase,
-		authUC:   authUC,
-		engine:   engine,
-		host:     host,
+		authorUC:   authorUseCase,
+		taskUC:     taskUseCase,
+		authUC:     authUC,
+		jwtService: jwtService,
+		engine:     engine,
+		host:       host,
 	}
 }

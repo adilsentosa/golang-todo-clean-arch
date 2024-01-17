@@ -26,9 +26,11 @@ func (m *AuthorUseCaseMock) FindAuthorByEmail(email string) (model.Author, error
 }
 
 func (m *AuthorUseCaseMock) UpdateAuthor(payload model.Author) (model.Author, error) {
-	panic("not implemented")
+	args := m.Called(payload)
+	return args.Get(0).(model.Author), args.Error(1)
 }
 
 func (m *AuthorUseCaseMock) RemoveAuthor(id string) error {
-	panic("not impl")
+	args := m.Called(id)
+	return args.Error(0)
 }

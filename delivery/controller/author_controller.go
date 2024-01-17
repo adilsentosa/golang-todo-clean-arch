@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"net/http"
+	"todo-clean-arch/delivery/middleware"
 	"todo-clean-arch/model"
 	"todo-clean-arch/shared/common"
 	"todo-clean-arch/usecase"
@@ -11,19 +12,21 @@ import (
 )
 
 type AuthorController struct {
-	authorUC usecase.AuthorUsecase
-	rg       *gin.RouterGroup
+	authorUC       usecase.AuthorUsecase
+	rg             *gin.RouterGroup
+	authMiddleware middleware.AuthMiddleware
 }
 
-func NewAuthorHandler(authorUC usecase.AuthorUsecase, rg *gin.RouterGroup) *AuthorController {
+func NewAuthorHandler(authorUC usecase.AuthorUsecase, rg *gin.RouterGroup, authMiddleware middleware.AuthMiddleware) *AuthorController {
 	return &AuthorController{
-		authorUC: authorUC,
-		rg:       rg,
+		authorUC:       authorUC,
+		rg:             rg,
+		authMiddleware: authMiddleware,
 	}
 }
 
 func (a *AuthorController) Route() {
-	a.rg.GET("/authors/list/:id", a.ListAuthor)
+	a.rg.GET("/authors/list/:id", a.authMiddleware.RequireToken("admin"), a.ListAuthor)
 	a.rg.GET("/authors/:id", a.GetAuthor)
 	a.rg.PUT("/authors/:id", a.UpdateAuthor)
 	a.rg.DELETE("/authors/:id", a.RemoveAuthor)
